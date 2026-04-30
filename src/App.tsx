@@ -13,8 +13,10 @@ import { Outro } from './stages/Outro';
 import { AnimatePresence, motion } from 'motion/react';
 import { TestPanel } from './components/TestPanel';
 import { AITutorProvider } from './contexts/AIContext';
+import { PasswordLock } from './components/PasswordLock';
 
 export default function App() {
+  const [unlockedStages, setUnlockedStages] = useState<Record<number, boolean>>({});
   const [gameState, setGameState] = useState({
     playerName: "",
     totalXP: 0,
@@ -114,13 +116,21 @@ export default function App() {
 
           {gameState.currentStage === 6 && (
             <motion.div key="stage6" initial={{ x: 100, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: -100, opacity: 0 }} className="h-full">
-              <Stage6 onComplete={wrapComplete(6)} playerName={gameState.playerName} />
+              {!unlockedStages[6] ? (
+                 <PasswordLock stageName="实战演练" correctPassword="42406" onUnlock={() => setUnlockedStages(prev => ({...prev, 6: true}))} onJump={handleJump} />
+              ) : (
+                 <Stage6 onComplete={wrapComplete(6)} playerName={gameState.playerName} />
+              )}
             </motion.div>
           )}
 
           {gameState.currentStage === 7 && (
             <motion.div key="stage7" initial={{ x: 100, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: -100, opacity: 0 }} className="h-full">
-              <QuizStage onComplete={wrapComplete(7)} />
+              {!unlockedStages[7] ? (
+                 <PasswordLock stageName="终极测验" correctPassword="42407" onUnlock={() => setUnlockedStages(prev => ({...prev, 7: true}))} onJump={handleJump} />
+              ) : (
+                 <QuizStage onComplete={wrapComplete(7)} />
+              )}
             </motion.div>
           )}
 
